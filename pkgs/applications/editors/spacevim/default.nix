@@ -2,7 +2,8 @@
 , git
 , fzf
 , makeWrapper
-, vim-full
+, vim
+, neovim-unwrapped
 , vimPlugins
 , fetchFromGitHub
 , lib
@@ -14,13 +15,7 @@
 
 let
   format = formats.toml { };
-  vim-customized = vim-full.customize {
-    name = "vim";
-    # Not clear at the moment how to import plugins such that
-    # SpaceVim finds them and does not auto download them to
-    # ~/.cache/vimfiles/repos
-    vimrcConfig.packages.myVimPackage = with vimPlugins; { start = [ ]; };
-  };
+  vim-customized = neovim-unwrapped;
   spacevimdir = runCommand "SpaceVim.d" { } ''
     mkdir -p $out
     cp ${format.generate "init.toml" spacevim_config} $out/init.toml
@@ -28,12 +23,13 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "spacevim";
-  version = "1.8.0";
+  version = "2.0.0";
   src = fetchFromGitHub {
     owner = "SpaceVim";
     repo = "SpaceVim";
     rev = "v${version}";
-    sha256 = "sha256:11snnh5q47nqhzjb9qya6hpnmlzc060958whqvqrh4hc7gnlnqp8";
+    # 2.0.0
+    sha256 = "sha256-a5HzjqwCg0b/c5wONOk+5QUzs/LS5N+Pb9hQBTwjhXs=";
   };
 
   nativeBuildInputs = [ makeWrapper vim-customized ];
@@ -42,7 +38,8 @@ stdenv.mkDerivation rec {
   buildPhase = ''
     runHook preBuild
     # generate the helptags
-    vim -u NONE -c "helptags $(pwd)/doc" -c q
+    export HOME=$(pwd)
+    nvim -u NONE -c "helptags $(pwd)/doc" -c q
     runHook postBuild
   '';
 
@@ -56,14 +53,14 @@ stdenv.mkDerivation rec {
     mkdir -p $out/bin
 
     cp -r $(pwd) $out/SpaceVim
-
+    echo "${spacevimdir}/"
     # trailing slash very important for SPACEVIMDIR
-    makeWrapper "${vim-customized}/bin/vim" "$out/bin/spacevim" \
-        --add-flags "-u $out/SpaceVim/vimrc" --set SPACEVIMDIR "${spacevimdir}/" \
-        --prefix PATH : ${lib.makeBinPath [ fzf git ripgrep]}
+    makeWrapper "${vim-customized}/bin/nvim" "$out/bin/spacevim" \
+        --set PATH ${lib.makeBinPath [ fzf git ripgrep]} \
+        --add-flags "-u $out/SpaceVim/vimrc" --set SPACEVIMDIR "${spacevimdir}/"
     runHook postInstall
   '';
-
+  
   meta = with lib; {
     description = "Modern Vim distribution";
     longDescription = ''

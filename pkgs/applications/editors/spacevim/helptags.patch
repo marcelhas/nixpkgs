@@ -1,11 +1,20 @@
+From c6e718e0b17a28371846dd084a0883029d6c5c8a Mon Sep 17 00:00:00 2001
+From: marcelhas <marcel.hasieber@gmail.com>
+Date: Thu, 16 Mar 2023 10:06:31 +0100
+Subject: [PATCH] tmp
+
+---
+ autoload/SpaceVim.vim | 7 -------
+ 1 file changed, 7 deletions(-)
+
 diff --git a/autoload/SpaceVim.vim b/autoload/SpaceVim.vim
-index 16688680..fcafd6f7 100644
+index 6231adab..6c9629d1 100644
 --- a/autoload/SpaceVim.vim
 +++ b/autoload/SpaceVim.vim
-@@ -1355,13 +1355,6 @@ function! SpaceVim#end() abort
+@@ -1468,13 +1468,6 @@ function! SpaceVim#end() abort
+   elseif g:spacevim_vim_help_language ==# 'ja'
      let &helplang = 'jp'
    endif
-   ""
 -  " generate tags for SpaceVim
 -  let help = fnamemodify(g:_spacevim_root_dir, ':p:h') . '/doc'
 -  try
@@ -13,6 +22,9 @@ index 16688680..fcafd6f7 100644
 -  catch
 -    call SpaceVim#logger#warn('Failed to generate helptags for SpaceVim')
 -  endtry
- 
-   ""
    " set language
+   if !empty(g:spacevim_language)
+     silent exec 'lan ' . g:spacevim_language
+-- 
+2.38.4
+
